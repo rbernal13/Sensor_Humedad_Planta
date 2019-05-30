@@ -43,40 +43,19 @@ void setup() {
 }
 
 void loop() {
-  
-  //Capturar datos
-  sensor_data = analogRead(sensor_pin);
-  Serial.println(sensor_data);
-
-  enviarDweet();
-
-  
-  
-  
-  // put your main code here, to run repeatedly:
-  delay(5000);
-  Serial.print("Esta conectado a ");
-  Serial.println(host);
-
-  // Crear conexion TCP
-  if (!client.connect(host, httpPort)) {
-    Serial.println("Conexion fallida");
-    return;
-  }
-
-  
-  //output_value = map(output_value,1024,500,0,100);
-  
-
-  if (digitalRead (led) == HIGH){
-    Serial.print("Estado del Led: ");
-    Serial.println(led);
-    Serial.print("Encendido!");
-  } else{
-    Serial.print("Estado del Led: ");
-    Serial.print("Apagado!");
-  }
-  
+	
+	//Capturar datos
+	sensor_data = analogRead(sensor_pin);
+	int output_value = 0;
+	output_value = map(sensor_data,1024,500,0,100);
+	Serial.println("Nivel de humedad: ");
+	Serial.println(output_value);
+	Serial.println(" %");
+	
+	//Enviar datos a dweet.io
+	enviarDweet();
+	
+	
    
   // Verificamos si existe alguna lectura fallida
   
@@ -119,22 +98,25 @@ void loop() {
 }
 
 void enviarDweet(){
-  WiFiClient client;
-  const int httpPort = 80;
+	WiFiClient client;
+	const int httpPort = 80;
   
-  if (!client.connect(host, httpPort)){
-    Serial.println("Conexion fallida a Dweet.io");
-    return;
-  }
+  	delay(5000);
+	Serial.print("Esta conectado a ");
+	Serial.println(host);
   
-  client.print(getDweetString());
-  delay(10); //wait...
-  while (client.available()){
-    String line = client.readStringUntil('\r');
-    Serial.print(line);
-  }
-  Serial.println();
-  Serial.println("closing connection");
   
-		
+	if (!client.connect(host, httpPort)){
+		Serial.println("Conexion fallida a Dweet.io");
+		return;
+	}
+  
+	client.print(getDweetString());
+	delay(10); //Esperar
+	while (client.available()){
+		String line = client.readStringUntil('\r');
+		Serial.print(line);
+	}
+	Serial.println();
+	Serial.println("Terminando conexion....");
 }
