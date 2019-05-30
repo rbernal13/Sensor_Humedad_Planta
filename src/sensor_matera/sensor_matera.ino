@@ -1,40 +1,27 @@
 #include <ESP8266WiFi.h>
-#include "DHT.h"
 
-// Pin
-#define DHTPIN D2
-
-// Use DHT11 sensor
-//#define DHTTYPE DHT11
-
-// Initialize DHT sensor
-//DHT dht(DHTPIN, DHTTYPE, 15);
-
-//LED on ESP8266 GPIO2
-const int lightPin = D2;
+// Sensor
+const int sensor_pin = A0;
+int sensor_data = 0;
 
 
 //WIFI Datos y Dweet.io
-const char* ssid = "Movistar_15683961";
-const char* password = "0096769669";
+const char* ssid = "LaRed";
+const char* password = "eslaclave";
 const char* host= "dweet.io";
-String sensor="ElSensor";
-WiFiClient client;
+String sensor="DonSensor";
 
 
 void setup() {
-  // Iniciar sensor:
-  pinMode(lightPin, OUTPUT);
-  digitalWrite(lightPin, LOW);
   
   Serial.begin(9600); 
-  //dht.begin();
-  //delay(15);
+  
   // Iniciar conexion WIFI
   Serial.println();
   Serial.println();
   Serial.print("Conectandose a  "); 
   Serial.println(ssid); 
+  
   // Conectarse a red WIFI LAN 
   WiFi.begin(ssid, password);   
   int intentos = 0; 
@@ -56,7 +43,15 @@ void setup() {
 }
 
 void loop() {
-  const int httpPort = 80;
+  
+  //Capturar datos
+  sensor_data = analogRead(sensor_pin);
+  Serial.println(sensor_data);
+
+  enviarDweet();
+
+  
+  
   
   // put your main code here, to run repeatedly:
   delay(5000);
@@ -69,13 +64,10 @@ void loop() {
     return;
   }
 
-  // Obtenemos la lectura del led
-  //float led = analogRead(lightPin);
-    pinMode(ledPin, OUTPUT);
-
-  digitalWrite(ledPin, HIGH);
-  float led = 1;
   
+  //output_value = map(output_value,1024,500,0,100);
+  
+
   if (digitalRead (led) == HIGH){
     Serial.print("Estado del Led: ");
     Serial.println(led);
@@ -98,7 +90,7 @@ void loop() {
   // https://dweet.io/dweet/for/lamatera_sensor?estado
   
   String url = "/dweet/for/lamatera_sensor19?estado=";
-  url += String(led);
+  url += String(DHTPIN);
 
   // Envio la peticion
   Serial.print("URL de solicitud: ");
@@ -124,4 +116,25 @@ void loop() {
   // Cerramos la conexion
   Serial.println();
   Serial.println("Cerrando conexion");
+}
+
+void enviarDweet(){
+  WiFiClient client;
+  const int httpPort = 80;
+  
+  if (!client.connect(host, httpPort)){
+    Serial.println("Conexion fallida a Dweet.io");
+    return;
+  }
+  
+  client.print(getDweetString());
+  delay(10); //wait...
+  while (client.available()){
+    String line = client.readStringUntil('\r');
+    Serial.print(line);
+  }
+  Serial.println();
+  Serial.println("closing connection");
+  
+		
 }

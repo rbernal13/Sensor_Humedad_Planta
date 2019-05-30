@@ -9,7 +9,7 @@ String sensor="ElSensor"
 
 //Variables Sensor
 String arrayVariableNames[]={"humedad"}; // Nombre de nuestro(s) sensores(s)
-int arrayVariableValues[]={"25"} // Valor de nuestro sensor o sensores
+int arrayVariableValues[]={"25"}; // Valor de nuestro sensor o sensores
 int numberVariables=sizeof(arrayVariableValues)/sizeof(arrayVariableValues[0]); // tamaño del argumento para cada variable
 
 

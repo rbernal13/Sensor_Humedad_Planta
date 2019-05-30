@@ -10,7 +10,7 @@ void setup() {
 void loop() {
 
   output_value= analogRead(sensor_pin);
-  // 1024 = seco 100%, 500=humedo 100%
+  // 1024 = seco 100%, 500 = humedo 100%
   output_value = map(output_value,1024,500,0,100);
   Serial.print("Mositure : ");
   Serial.print(output_value);
