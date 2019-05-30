@@ -9,7 +9,7 @@ int sensor_data = 0;
 const char* ssid = "LaRed";
 const char* password = "eslaclave";
 const char* host= "dweet.io";
-String sensor="DonSensor";
+String sensor_name="Don sensor de la matera19";
 
 
 void setup() {
@@ -48,27 +48,59 @@ void loop() {
 	sensor_data = analogRead(sensor_pin);
 	int output_value = 0;
 	output_value = map(sensor_data,1024,500,0,100);
+
+  //Verificar data
+  if (isnan(sensor_data)) {
+    Serial.println("Error de lectura en el sensor YL-69");
+    return;
+  }
+  
 	Serial.println("Nivel de humedad: ");
 	Serial.println(output_value);
 	Serial.println(" %");
 	
 	//Enviar datos a dweet.io
-	enviarDweet();
+
+  Serial.print("Enviando dweet a ");
+  Serial.print(host);
+  Serial.print("/follow/");
+  Serial.print(sensor_name);
+  Serial.println();
 	
-	
-   
-  // Verificamos si existe alguna lectura fallida
-  
-  /*if (isnan(led)) {
-    Serial.println("Error de lectura en el sensor DHT");
-    return;
-  }
-  */
-  
   // Creamos una URI para las peticiones
-  // https://dweet.io/dweet/for/lamatera_sensor?estado
+  // https://dweet.io/dweet/for/donsensor_matera19?estado
+
+  enviarDweet(); //Conexion TCP y envio Dweet
+  delay(2000);
+}
+
+void enviarDweet(){
+	WiFiClient client;
+	const int httpPort = 80;
   
-  String url = "/dweet/for/lamatera_sensor19?estado=";
+  delay(5000);
+	Serial.print("Esta conectandose a ");
+	Serial.println(host);
+  
+  
+	if (!client.connect(host, httpPort)){
+		Serial.println("Conexion fallida a Dweet.io");
+		return;
+	}
+  
+	client.print(getDweetString());
+	delay(10); //Esperar
+	while (client.available()){
+		String line = client.readStringUntil('\r');
+		Serial.print(line);
+	}
+	Serial.println();
+	Serial.println("Terminando conexion....");
+}
+
+
+/***
+  String url = "/dweet/for/donsensor_matera19?estado";
   url += String(DHTPIN);
 
   // Envio la peticion
@@ -96,27 +128,4 @@ void loop() {
   Serial.println();
   Serial.println("Cerrando conexion");
 }
-
-void enviarDweet(){
-	WiFiClient client;
-	const int httpPort = 80;
-  
-  	delay(5000);
-	Serial.print("Esta conectado a ");
-	Serial.println(host);
-  
-  
-	if (!client.connect(host, httpPort)){
-		Serial.println("Conexion fallida a Dweet.io");
-		return;
-	}
-  
-	client.print(getDweetString());
-	delay(10); //Esperar
-	while (client.available()){
-		String line = client.readStringUntil('\r');
-		Serial.print(line);
-	}
-	Serial.println();
-	Serial.println("Terminando conexion....");
-}
+***/
