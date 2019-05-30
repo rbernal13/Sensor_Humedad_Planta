@@ -68,18 +68,33 @@ void loop() {
   }
 
   // Obtenemos la lectura del led
-  float led = analogRead(lightPin);
+  //float led = analogRead(lightPin);
+    pinMode(ledPin, OUTPUT);
 
-  Serial.print("Estado del Led: ");
-  Serial.println(led);
+  digitalWrite(ledPin, HIGH);
+  float led = 1;
+  
+  if (digitalRead (led) == HIGH){
+    Serial.print("Estado del Led: ");
+    Serial.println(led);
+    Serial.print("Encendido!");
+  } else{
+    Serial.print("Estado del Led: ");
+    Serial.print("Apagado!");
+  }
+  
    
   // Verificamos si existe alguna lectura fallida
-  if (isnan(led)) {
+  
+  /*if (isnan(led)) {
     Serial.println("Error de lectura en el sensor DHT");
     return;
   }
-
+  */
+  
   // Creamos una URI para las peticiones
+  // https://dweet.io/dweet/for/lamatera_sensor?estado
+  
   String url = "/dweet/for/lamatera_sensor19?estado=";
   url += String(led);
 
