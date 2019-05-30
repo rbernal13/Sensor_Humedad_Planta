@@ -1,24 +1,24 @@
+#include <ESP8266WiFi.h>
 #include "DHT.h"
 
 // Pin
-#define DHTPIN D1
+#define DHTPIN D2
 
 // Use DHT11 sensor
-#define DHTTYPE DHT11
+//#define DHTTYPE DHT11
 
 // Initialize DHT sensor
 //DHT dht(DHTPIN, DHTTYPE, 15);
 
 //LED on ESP8266 GPIO2
-const int lightPin = 2;
+const int lightPin = D2;
 
 
 //WIFI Datos y Dweet.io
 const char* ssid = "Movistar_15683961";
 const char* password = "0096769669";
 const char* host= "dweet.io";
-String sensor="ElSensor"
-const int httpPort = 80;
+String sensor="ElSensor";
 WiFiClient client;
 
 
@@ -56,6 +56,8 @@ void setup() {
 }
 
 void loop() {
+  const int httpPort = 80;
+  
   // put your main code here, to run repeatedly:
   delay(5000);
   Serial.print("Esta conectado a ");
