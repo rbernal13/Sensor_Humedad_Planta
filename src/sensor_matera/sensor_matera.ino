@@ -1,5 +1,13 @@
-#include <ESP8266WiFi.h>
+#include "DHT.h"
 
+// Pin
+#define DHTPIN D1
+
+// Use DHT11 sensor
+#define DHTTYPE DHT11
+
+// Initialize DHT sensor
+//DHT dht(DHTPIN, DHTTYPE, 15);
 
 //WIFI Datos y Dweet.io
 const char* ssid = "Movistar_15683961";
@@ -7,13 +15,9 @@ const char* password = "0096769669";
 const char* host= "dweet.io";
 String sensor="ElSensor"
 
-//Variables Sensor
-String arrayVariableNames[]={"humedad"}; // Nombre de nuestro(s) sensores(s)
-int arrayVariableValues[]={"25"} // Valor de nuestro sensor o sensores
-int numberVariables=sizeof(arrayVariableValues)/sizeof(arrayVariableValues[0]); // tamaño del argumento para cada variable
 
-
-void setup() { 
+void setup() {
+  // put your setup code here, to run once:
   Serial.begin(9600); 
   // Iniciar conexion WIFI
   Serial.println();
@@ -37,23 +41,10 @@ void setup() {
     Serial.println(WiFi.localIP());
     Serial.println(F("======================================================"));
     } 
-  Serial.println(F("Config lista"));  
+  Serial.println(F("Config lista"));
 }
 
 void loop() {
+  // put your main code here, to run repeatedly:
 
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
-
-  long now = millis();
-  if (now - lastMsg > 2000) {
-    lastMsg = now;
-    ++value;
-    snprintf (msg, 50, "hello world #%ld", value);
-    Serial.print("Publish message: ");
-    Serial.println(msg);
-    client.publish("topic", msg);
-  }
 }
