@@ -1,17 +1,26 @@
 #include <ESP8266WiFi.h>
 
-// Sensor
+/**
+ * Datos del sensor YL-69
+ **/
+
 const int sensor_pin = A0;
 int sensor_data = 0;
 
 
-//WIFI Datos y Dweet.io
+/**
+ * Datos para la red WIFI local y la URI Dweet.io
+ **/
+
 const char* ssid = "LaRed";
 const char* password = "eslaclave";
 const char* host= "dweet.io";
 String sensor_name="Don sensor de la matera19";
 
 
+/**
+ * Setup - Configuracion de WIFI Local
+ **/
 void setup() {
   
   Serial.begin(9600); 
@@ -42,14 +51,18 @@ void setup() {
   Serial.println(F("Config lista"));
 }
 
+
+/**
+ * Loop - Main del sensonr
+ **/
 void loop() {
 	
-	//Capturar datos
+	// Capturar datos
 	sensor_data = analogRead(sensor_pin);
 	int output_value = 0;
 	output_value = map(sensor_data,1024,500,0,100);
 
-  //Verificar data
+  // Verificar data
   if (isnan(sensor_data)) {
     Serial.println("Error de lectura en el sensor YL-69");
     return;
@@ -59,8 +72,7 @@ void loop() {
 	Serial.println(output_value);
 	Serial.println(" %");
 	
-	//Enviar datos a dweet.io
-
+	// Enviar datos a dweet.io
   Serial.print("Enviando dweet a ");
   Serial.print(host);
   Serial.print("/follow/");
@@ -69,11 +81,14 @@ void loop() {
 	
   // Creamos una URI para las peticiones
   // https://dweet.io/dweet/for/donsensor_matera19?estado
-
   enviarDweet(); //Conexion TCP y envio Dweet
   delay(2000);
 }
 
+
+/**
+ * enviarDweet - Establecer conexion TCP para enviar el "dweet" a Dweet.io
+ **/
 void enviarDweet(){
 	WiFiClient client;
 	const int httpPort = 80;
@@ -88,7 +103,7 @@ void enviarDweet(){
 		return;
 	}
   
-	client.print(getDweetString());
+	client.print(crearDweetString());
 	delay(10); //Esperar
 	while (client.available()){
 		String line = client.readStringUntil('\r');
@@ -99,7 +114,35 @@ void enviarDweet(){
 }
 
 
+/**
+ * crearDweetString - Creacion del String con los datos para enviar a Dweet.io
+ * Usar GET para postear en Dweet.io
+ **/
+void crearDweetString(){
+  int i = 0;
+ 
+  String dweetHttpGet="GET /dweet/for/";
+  dweetHttpGet=dweetHttpGet+String(thingName)+"?";
+
+  for(i=0;i<(numberVariables);i++){
+    if(i==numberVariables-1){
+      //the lastone doesnt have a "&" at the end
+      dweetHttpGet=dweetHttpGet + String(arrayVariableNames[i]) + "=" + String(arrayVariableValues[i]);
+    }
+    else
+      dweetHttpGet=dweetHttpGet + String(arrayVariableNames[i]) + "="+ String(arrayVariableValues[i]) + "&";
+  }
+  dweetHttpGet=dweetHttpGet+" HTTP/1.1\r\n"+
+               "Host: " +
+                 host +
+               "\r\n" +
+               "Connection: close\r\n\r\n";
+  return dweetHttpGet;//this is our freshly made http string request
+}
+
 /***
+ * 
+ * 
   String url = "/dweet/for/donsensor_matera19?estado";
   url += String(DHTPIN);
 
@@ -127,5 +170,5 @@ void enviarDweet(){
   // Cerramos la conexion
   Serial.println();
   Serial.println("Cerrando conexion");
-}
+
 ***/
