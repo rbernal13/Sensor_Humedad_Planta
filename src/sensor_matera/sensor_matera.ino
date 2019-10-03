@@ -4,10 +4,14 @@
 /**
  * Datos del sensor de humedad YL-69
  **/
+const int relay_pin = 0;
 const int sensor_pin = A0;
+const int rojo_pin = 16;
+const int verde_pin = 5;
 int sensor_data = 0;
-String arrayVariableNames[]={"Humedad","LedRojo","LedVerde"};
-int arrayVariableValues[]={10,0,0};
+int bomba = 0;
+String arrayVariableNames[]={"Humedad","LedRojo","LedVerde","Bomba"};
+int arrayVariableValues[]={10,0,0,0};
 
 int numberVariables=sizeof(arrayVariableValues)/sizeof(arrayVariableValues[0]);
 
@@ -27,9 +31,15 @@ String sensor_name="donsensor_matera19"; // https://dweet.io/dweet/for/donsensor
  **/
 void setup() {
   
-  Serial.begin(9600); 
-  pinMode(16, OUTPUT);
-  pinMode(5, OUTPUT);
+  Serial.begin(9600);
+
+  //Iniciar LED's y Relay-Bomba
+  pinMode(rojo_pin, OUTPUT);
+  pinMode(verde_pin, OUTPUT);
+  pinMode(relay_pin, OUTPUT);
+
+  digitalWrite(relay_pin, HIGH);
+  
   // Iniciar conexion WIFI
   Serial.println();
   Serial.println();
@@ -80,29 +90,42 @@ void loop() {
 	Serial.println(output_value);
 	Serial.println(" %");
 
-  int lred=-1, lgreen=-1;
-  
-  if(output_value <= 50 ){
-    digitalWrite(16, HIGH);
-    digitalWrite(5, LOW);
-    lred=1;
-    lgreen=0;
+  int lrojo=-1, lverde=-1;
 
-    arrayVariableValues[1] = lred;
-    arrayVariableNames[1] = "LedRed";
-    arrayVariableValues[2] = lgreen;
-    arrayVariableNames[2] = "LedGreen";
+  //Verificar
+  if(output_value <= 50 ){
+    digitalWrite(rojo_pin, HIGH);
+    digitalWrite(verde_pin, LOW);
+    digitalWrite(relay_pin, LOW);
+    delay(4000);
+    digitalWrite(relay_pin, HIGH);
+    
+    lrojo=1;
+    lverde=0;
+    bomba=1;
+
+    arrayVariableValues[1] = lrojo;
+    arrayVariableNames[1] = "LedRojo";
+    arrayVariableValues[2] = lverde;
+    arrayVariableNames[2] = "LedVerde";
+    arrayVariableValues[3] = bomba;
+    arrayVariableNames[3] = "BombaON";
     
   }else{
-    digitalWrite(5, HIGH);
-    digitalWrite(16, LOW);
-    lred=0;
-    lgreen=1;
+    digitalWrite(verde_pin, HIGH);
+    digitalWrite(rojo_pin, LOW);
+    digitalWrite(relay_pin, HIGH);
+    
+    lrojo=0;
+    lverde=1;
+    bomba=0;
 
-    arrayVariableValues[1] = lred;
-    arrayVariableNames[1] = "LedRed";
-    arrayVariableValues[2] = lgreen;
-    arrayVariableNames[2] = "LedGreen";
+    arrayVariableValues[1] = lrojo;
+    arrayVariableNames[1] = "LedRojo";
+    arrayVariableValues[2] = lverde;
+    arrayVariableNames[2] = "LedVerde";
+    arrayVariableValues[3] = bomba;
+    arrayVariableNames[3] = "BombaOFF";
   }
 	
 	// Enviar datos a dweet.io
